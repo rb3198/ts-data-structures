@@ -225,3 +225,78 @@ describe("Search tests", () => {
     }
   });
 });
+
+describe("Deletion tests", () => {
+  let tree: AVLTree<number, string> = new AVLTree();
+  beforeEach(() => {
+    tree = new AVLTree();
+  });
+  it("Should throw UnexpectedOperation Exception if attempted on uninitialized tree, or if the key was not found in the tree", () => {
+    try {
+      tree.delete(Math.floor(Math.random() * 100));
+      fail();
+    } catch (error) {
+      if (error instanceof AVLTreeError) {
+        expect(error.code).toBe(AVLTreeErrorCode.UnexpectedOperation);
+        try {
+          tree.insert(1, "Test");
+          tree.delete(10);
+        } catch (error) {
+          if (error instanceof AVLTreeError) {
+            expect(error.code).toBe(AVLTreeErrorCode.UnexpectedOperation);
+          } else {
+            fail();
+          }
+        }
+      } else {
+        fail();
+      }
+    }
+  });
+
+  it("Should delete while maintaining the AVL tree property", () => {
+    tree.insertMany(commonInput);
+    tree.delete(5);
+    expect(tree.inOrderTraversal(tree.root)).toEqual([
+      [0, "William"],
+      [1, "Elizabeth"],
+      [2, "Shaanti"],
+      [4, "Samantha"],
+      [6, "Manshiv"],
+      [8, "Saanya"],
+      [10, "Ronit"],
+      [15, "Pranav"],
+      [20, "Hitesh"],
+      [21, "John"],
+      [23, "Napoleon"],
+      [30, "Anirudh"],
+    ]);
+    tree.delete(10);
+    expect(tree.inOrderTraversal(tree.root)).toEqual([
+      [0, "William"],
+      [1, "Elizabeth"],
+      [2, "Shaanti"],
+      [4, "Samantha"],
+      [6, "Manshiv"],
+      [8, "Saanya"],
+      [15, "Pranav"],
+      [20, "Hitesh"],
+      [21, "John"],
+      [23, "Napoleon"],
+      [30, "Anirudh"],
+    ]);
+    tree.delete(8);
+    expect(tree.inOrderTraversal(tree.root)).toEqual([
+      [0, "William"],
+      [1, "Elizabeth"],
+      [2, "Shaanti"],
+      [4, "Samantha"],
+      [6, "Manshiv"],
+      [15, "Pranav"],
+      [20, "Hitesh"],
+      [21, "John"],
+      [23, "Napoleon"],
+      [30, "Anirudh"],
+    ]);
+  });
+});
