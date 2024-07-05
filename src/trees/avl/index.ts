@@ -73,7 +73,7 @@ export class AVLTree<K, V> {
     this.root = this.deleteHelper(key, this.root);
   };
 
-  deleteHelper = (
+  private deleteHelper = (
     key: K,
     root?: Node<K, V> | null
   ): Node<K, V> | undefined | null => {
@@ -149,13 +149,14 @@ export class AVLTree<K, V> {
     }
     let ptr: Node<K, V> | undefined | null = this.root;
     while (ptr) {
-      if (searchKey === ptr.key) {
-        return ptr.data;
+      const { key, data, right } = ptr;
+      if (searchKey === key) {
+        return [key, data];
       }
-      if (searchKey < ptr.key) {
+      if (searchKey < key) {
         ptr = ptr.left;
       } else {
-        ptr = ptr.right;
+        ptr = right;
       }
     }
     throw new AVLTreeError(
@@ -211,10 +212,10 @@ export class AVLTree<K, V> {
     return this.searchClosestHelper(searchKey, root.right, minDistRoots);
   };
 
-  //#region Rotation Methods
-  private getHeight = (root: Node<K, V>) => {
+  getHeight = (root: Node<K, V>) => {
     return 1 + Math.max(root?.left?.height ?? 0, root?.right?.height ?? 0);
   };
+  //#region Rotation Methods
   private llRotate = (root: Node<K, V>) => {
     const lChild = root.left;
     if (!lChild) {
