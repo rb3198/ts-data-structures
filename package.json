@@ -1,0 +1,27 @@
+{
+  "name": "ts-data-structures-collection",
+  "version": "0.0.1",
+  "description": "A collection of Data Structures defined in TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rb3198/ts-data-structures.git"
+  },
+  "keywords": [
+    "data",
+    "structures"
+  ],
+  "author": "rb3198",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rb3198/ts-data-structures/issues"
+  },
+  "homepage": "https://github.com/rb3198/ts-data-structures#readme",
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  }
+}
