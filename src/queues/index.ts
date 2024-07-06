@@ -1,1 +1,1 @@
-console.log("Hello from queues");
+export { PriorityQueue } from "./priority_queue";

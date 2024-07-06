@@ -1,11 +1,26 @@
 {
   "name": "ts-data-structures-collection",
-  "version": "0.0.1",
+  "version": "0.0.16",
   "description": "A collection of Data Structures defined in TypeScript",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "jest"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./trees": {
+      "default": "./dist/trees/index.js",
+      "types": "./dist/trees/index.d.ts"
+    },
+    "./queues": {
+      "default": "./dist/queues/index.js",
+      "types": "./dist/queues/index.d.ts"
+    }
   },
   "repository": {
     "type": "git",

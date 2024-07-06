@@ -1,5 +1,5 @@
-import { AVLTree } from "../../dist/trees/avl";
-import { AVLTreeError, AVLTreeErrorCode } from "../../dist/trees/avl/Error";
+import { AVLTree } from "../../src/trees";
+import { AVLTreeError, AVLTreeErrorCode } from "../../src/trees/avl/Error";
 
 const commonInput: [number, string][] = [
   [10, "Ronit"],
