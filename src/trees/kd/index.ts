@@ -6,10 +6,27 @@ export class KDTree<V> {
   /**
    * The number of dimensions this tree belongs to. The key of each node will be of 'k' dims.
    */
-  private k: number;
+  private _k: number;
+  public get k(): number {
+    return this._k;
+  }
+  private set k(k: number) {
+    this._k = k;
+  }
+
+  /**
+   * The tree automatically re-balances itself after `reBalanceFactor` number of operations.
+   *
+   * Can be set to Infinity to never re-balance automatically.
+   * @default Infinity
+   */
+  reBalanceFactor: number;
+  private nOps: number = 0;
   root?: Node<V> | null;
-  constructor(k: number) {
-    this.k = k;
+  constructor(k: number, reBalanceFactor?: number) {
+    this._k = k;
+    this.reBalanceFactor = reBalanceFactor || Infinity;
+    this.nOps = this.nOps || 0;
   }
 
   //#region Public methods
@@ -22,6 +39,10 @@ export class KDTree<V> {
       );
     }
     this.root = this.insertHelper(key, value, 0, this.root);
+    this.nOps++;
+    if (this.nOps % this.reBalanceFactor === 0) {
+      this.reBalanceTree();
+    }
   };
 
   update = (key: number[], value: V) => {
@@ -82,6 +103,10 @@ export class KDTree<V> {
 
   delete = (key: number[]) => {
     this.root = this.deleteHelper(key, 0, this.root);
+    this.nOps++;
+    if (this.nOps % this.reBalanceFactor === 0) {
+      this.reBalanceTree();
+    }
   };
 
   printTree() {
@@ -122,8 +147,70 @@ export class KDTree<V> {
    *
    * Uses QuickSelect to sort the tree. May change the root of the tree.
    */
-  reBalanceTree = () => {};
+  reBalanceTree = () => {
+    const nodes = this.inOrderTraversal(this.root, []);
+    let depth = 0;
+    const d = depth % this.k;
+    nodes.sort((n1, n2) => n1[0][d] - n2[0][d]);
+    const mid = Math.floor((nodes.length - 1) / 2);
+    this.root = new Node(nodes[mid][0], nodes[mid][1]);
+    const queue: {
+      ptr: Node<V>;
+      left: [number[], V][];
+      right: [number[], V][];
+    }[] = [];
+    queue.push({
+      ptr: this.root,
+      left: nodes.slice(0, mid),
+      right: nodes.slice(mid + 1),
+    });
+    while (queue.length) {
+      depth++;
+      const { ptr, left, right } = queue.shift()!;
+      const d = depth % this.k;
+      left.sort((n1, n2) => n1[0][d] - n2[0][d]);
+      right.sort((n1, n2) => n1[0][d] - n2[0][d]);
+      if (left.length) {
+        const mid = Math.floor((left.length - 1) / 2);
+        ptr.left = new Node(left[mid][0], left[mid][1]);
+        queue.push({
+          ptr: ptr.left,
+          left: left.slice(0, mid),
+          right: left.slice(mid + 1),
+        });
+      }
+      if (right.length) {
+        const mid = Math.floor((right.length - 1) / 2);
+        ptr.right = new Node(right[mid][0], right[mid][1]);
+        queue.push({
+          ptr: ptr.right,
+          left: right.slice(0, mid),
+          right: right.slice(mid + 1),
+        });
+      }
+    }
+  };
 
+  //#endregion
+
+  //#region Traversal methods
+
+  /**
+   * In-order traversal of the tree, getting all the nodes.
+   * @param root
+   * @param result
+   * @returns
+   */
+  inOrderTraversal = (root?: Node<V> | null, result: [number[], V][] = []) => {
+    if (!root) {
+      return result;
+    }
+    const { key, data, left, right } = root;
+    this.inOrderTraversal(left, result);
+    result.push([key, data]);
+    this.inOrderTraversal(right, result);
+    return result;
+  };
   //#endregion
   //#region Private methods and helpers
   private insertHelper = (
