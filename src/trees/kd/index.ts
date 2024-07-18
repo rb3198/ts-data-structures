@@ -150,43 +150,76 @@ export class KDTree<V> {
   reBalanceTree = () => {
     const nodes = this.inOrderTraversal(this.root, []);
     let depth = 0;
-    const d = depth % this.k;
-    nodes.sort((n1, n2) => n1[0][d] - n2[0][d]);
-    const mid = Math.floor((nodes.length - 1) / 2);
-    this.root = new Node(nodes[mid][0], nodes[mid][1]);
+    const { node, pivotIdx: mid } = this.quickSelect(
+      0,
+      nodes.length - 1,
+      Math.floor(nodes.length / 2),
+      depth,
+      nodes
+    );
+    this.root = node;
+    const { left, right } = this.getLeftRightNodes(nodes, mid, 0);
     const queue: {
       ptr: Node<V>;
       left: [number[], V][];
       right: [number[], V][];
+      depth: number;
     }[] = [];
-    queue.push({
-      ptr: this.root,
-      left: nodes.slice(0, mid),
-      right: nodes.slice(mid + 1),
-    });
+    if (this.root) {
+      queue.push({
+        ptr: this.root,
+        left,
+        right,
+        depth: 1,
+      });
+    }
     while (queue.length) {
-      depth++;
-      const { ptr, left, right } = queue.shift()!;
-      const d = depth % this.k;
-      left.sort((n1, n2) => n1[0][d] - n2[0][d]);
-      right.sort((n1, n2) => n1[0][d] - n2[0][d]);
+      const { ptr, left, right, depth } = queue.shift()!;
       if (left.length) {
-        const mid = Math.floor((left.length - 1) / 2);
-        ptr.left = new Node(left[mid][0], left[mid][1]);
-        queue.push({
-          ptr: ptr.left,
-          left: left.slice(0, mid),
-          right: left.slice(mid + 1),
-        });
+        const { node, pivotIdx: mid } = this.quickSelect(
+          0,
+          left.length - 1,
+          Math.floor(left.length / 2),
+          depth,
+          left
+        );
+        ptr.left = node;
+        if (ptr.left) {
+          const { left: l, right: r } = this.getLeftRightNodes(
+            left,
+            mid,
+            depth
+          );
+          queue.push({
+            ptr: ptr.left,
+            left: l,
+            right: r,
+            depth: depth + 1,
+          });
+        }
       }
       if (right.length) {
-        const mid = Math.floor((right.length - 1) / 2);
-        ptr.right = new Node(right[mid][0], right[mid][1]);
-        queue.push({
-          ptr: ptr.right,
-          left: right.slice(0, mid),
-          right: right.slice(mid + 1),
-        });
+        const { node, pivotIdx: mid } = this.quickSelect(
+          0,
+          right.length - 1,
+          Math.floor(right.length / 2),
+          depth,
+          right
+        );
+        ptr.right = node;
+        if (ptr.right) {
+          const { left: l, right: r } = this.getLeftRightNodes(
+            right,
+            mid,
+            depth
+          );
+          queue.push({
+            ptr: ptr.right,
+            left: l,
+            right: r,
+            depth: depth + 1,
+          });
+        }
       }
     }
   };
@@ -397,6 +430,69 @@ export class KDTree<V> {
       );
     }
     return solutionsCopy;
+  };
+
+  quickSelect = (
+    l: number,
+    r: number,
+    k: number,
+    depth: number,
+    nodes: [number[], V][]
+  ): { pivotIdx: number; node: Node<V> } => {
+    const pivot = nodes[r];
+    const [pivotKey, pivotValue] = pivot;
+    const d = depth % this.k;
+    if (r === l) {
+      return {
+        pivotIdx: r,
+        node: new Node(pivotKey, pivotValue),
+      };
+    }
+    let j = l;
+    for (let i = l; i < r; i++) {
+      const [key] = nodes[i];
+      if (key[d] < pivotKey[d]) {
+        [nodes[i], nodes[j]] = [nodes[j], nodes[i]];
+        j++;
+      }
+    }
+    [nodes[j], nodes[r]] = [nodes[r], nodes[j]];
+    if (j === k) {
+      while (j > 0 && nodes[j - 1][0][d] === nodes[j][0][d]) {
+        j--;
+      }
+      return {
+        pivotIdx: j,
+        node: new Node(nodes[j][0], nodes[j][1]),
+      };
+    }
+    if (j < k) {
+      return this.quickSelect(j + 1, r, k, depth, nodes);
+    }
+    return this.quickSelect(l, j - 1, k, depth, nodes);
+  };
+
+  private getLeftRightNodes = (
+    nodes: [number[], V][],
+    mid: number,
+    depth: number
+  ) => {
+    const left: [number[], V][] = [],
+      right: [number[], V][] = [];
+    const [rootKey] = nodes[mid];
+    const d = depth % this.k;
+    for (let i = 0; i < nodes.length; i++) {
+      if (i === mid) {
+        continue;
+      }
+      const [key] = nodes[i];
+      if (key[d] < rootKey[d]) {
+        left.push(nodes[i]);
+      } else {
+        right.push(nodes[i]);
+      }
+    }
+    return { left, right };
   };
 
   /**
