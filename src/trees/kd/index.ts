@@ -255,6 +255,12 @@ export class KDTree<V> {
     if (!root) {
       return new Node(key, value);
     }
+    if (this.arePointsIdentical(key, root.key)) {
+      throw new TreeError(
+        TreeErrorCode.DuplicateKey,
+        "Duplicate keys not allowed"
+      );
+    }
     if (key[level % this.k] < root.key[level % this.k]) {
       root.left = this.insertHelper(key, value, level + 1, root.left);
     } else {
@@ -432,7 +438,7 @@ export class KDTree<V> {
     return solutionsCopy;
   };
 
-  quickSelect = (
+  private quickSelect = (
     l: number,
     r: number,
     k: number,
