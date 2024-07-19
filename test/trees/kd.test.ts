@@ -3,6 +3,8 @@ import { KDTree } from "../../src/trees/kd";
 import { fail } from "../utils";
 import { verifyKdTreeProperty } from "../utils/trees";
 import {
+  imbalancedInsertions2d,
+  imbalancedInsertions3d,
   improperKeyLengthInsertions,
   insertionTests2d,
   insertionTests3d,
@@ -92,6 +94,39 @@ describe("Insertion tests", () => {
           .toBe(`Invalid key. The number of elements (dimensions) in the key must match the parameter 'k' passed to the constructor.\n
         Expected length: ${k}. Actual length: ${insert[0].length}`);
       }
+    }
+  );
+});
+
+describe("Re-balancing tests", () => {
+  it.each(imbalancedInsertions2d)(
+    "Should maintain KD Tree property post re-balancing --2D Tree",
+    (test) => {
+      const { initialInOrderTraversal, inserts, postBalancingTraversal } = test;
+      const tree = new KDTree(2);
+      inserts.forEach(({ key, value }) => {
+        tree.insert(key, value);
+      });
+      expect(verifyKdTreeProperty(2, 0, tree.root)).toBe(true);
+      expect(tree.inOrderTraversal(tree.root)).toEqual(initialInOrderTraversal);
+      tree.reBalanceTree();
+      expect(verifyKdTreeProperty(2, 0, tree.root)).toBe(true);
+      expect(tree.inOrderTraversal(tree.root)).toEqual(postBalancingTraversal);
+    }
+  );
+  it.each(imbalancedInsertions3d)(
+    "Should maintain KD Tree property post re-balancing --3D Tree",
+    (test) => {
+      const { initialInOrderTraversal, inserts, postBalancingTraversal } = test;
+      const tree = new KDTree(3);
+      inserts.forEach(({ key, value }) => {
+        tree.insert(key, value);
+      });
+      expect(tree.inOrderTraversal(tree.root)).toEqual(initialInOrderTraversal);
+      expect(verifyKdTreeProperty(3, 0, tree.root)).toBe(true);
+      tree.reBalanceTree();
+      expect(verifyKdTreeProperty(3, 0, tree.root)).toBe(true);
+      expect(tree.inOrderTraversal(tree.root)).toEqual(postBalancingTraversal);
     }
   );
 });
