@@ -33,9 +33,14 @@ export const insertionTests2d = [
         key: [10, 8],
         value: "",
       },
+      {
+        key: [5, 7],
+        value: "",
+      },
     ],
     inOrderTraversal: [
       [[1, 7], ""],
+      [[5, 7], ""],
       [[7, 8], ""],
       [[10, 5], ""],
       [[11, 0], ""],

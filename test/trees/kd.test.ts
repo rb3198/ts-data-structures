@@ -130,3 +130,77 @@ describe("Re-balancing tests", () => {
     }
   );
 });
+
+describe("Deletion tests", () => {
+  const testDeletion = (
+    k: number,
+    tree: KDTree<string>,
+    test: {
+      inserts: { key: number[]; value: string }[];
+      inOrderTraversal: (string | number[])[][];
+    }
+  ) => {
+    const { inserts: insertsOg } = test;
+    const inserts = [...insertsOg];
+    inserts.forEach(({ key, value }) => tree.insert(key, value));
+    while (inserts.length > 1) {
+      const randomElementIdx = Math.floor(Math.random() * inserts.length);
+      const randomElement = inserts[randomElementIdx];
+      if (!randomElement) {
+        fail("Test logic failure.");
+        return;
+      }
+      const { key, value } = randomElement;
+      const searchResult = tree.search(key);
+      // Ensuring that the element is present in the tree before attempting to delete it.
+      expect(searchResult).toEqual([key, value]);
+      const root = tree.delete(key);
+      expect(root).toBe(tree.root);
+      expect(verifyKdTreeProperty(k, 0, root)).toBe(true);
+      try {
+        tree.search(key);
+      } catch (error) {
+        // Searching the deleted element should throw a `KeyNotFound` error post deletion.
+        if (!(error instanceof TreeError)) {
+          console.log(key);
+          tree.printTree();
+          fail(
+            `Unexpected type of error occurred when testing the delete logic. ${error}`
+          );
+          return;
+        }
+        const { code } = error;
+        expect(code).toBe(TreeErrorCode.NotFound);
+      }
+      inserts.splice(randomElementIdx, 1);
+    }
+    expect(tree.root).not.toBeFalsy();
+    expect(tree.root?.key).toEqual(inserts[0].key);
+  };
+  it.each(insertionTests2d)(
+    "Should maintain KD Tree property after deletion --2D Tree",
+    (test) => {
+      const tree = new KDTree<string>(k);
+      testDeletion(2, tree, test);
+    }
+  );
+  it.each(insertionTests3d)(
+    "Should maintain KD Tree property after deletion --3D Tree",
+    (test) => {
+      const tree = new KDTree<string>(3);
+      testDeletion(3, tree, test);
+    }
+  );
+  it("Should re-balance the tree if `reBalanceFactor` of the tree is not `Infinity`", () => {
+    const [test] = insertionTests2d;
+    const reBalanceFactor = 3,
+      k = 2;
+    const tree = new KDTree<string>(k, reBalanceFactor);
+    const reBalanceSpy = jest
+      .spyOn(tree, "reBalanceTree")
+      .mockImplementation(() => {});
+    testDeletion(2, tree, test);
+    // 9 inserts + 8 deletions = 17 ops. reBalanceFactor = 3, so re-balancing should've been performed 5 times.
+    expect(reBalanceSpy).toHaveBeenCalledTimes(5);
+  });
+});

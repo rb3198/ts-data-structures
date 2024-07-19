@@ -30,6 +30,12 @@ export class KDTree<V> {
   }
 
   //#region Public methods
+  /**
+   *
+   * @param key
+   * @param value
+   * @throws
+   */
   insert = (key: number[], value: V) => {
     if (key.length !== this.k) {
       throw new TreeError(
@@ -107,6 +113,7 @@ export class KDTree<V> {
     if (this.nOps % this.reBalanceFactor === 0) {
       this.reBalanceTree();
     }
+    return this.root;
   };
 
   printTree() {
@@ -327,6 +334,7 @@ export class KDTree<V> {
         root.data = minNode.data;
         root.key = minNode.key;
         root.right = this.deleteHelper(root.key, depth + 1, root.left);
+        root.left = null;
       } else {
         return null;
       }
