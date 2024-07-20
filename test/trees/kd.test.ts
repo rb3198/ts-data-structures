@@ -306,3 +306,47 @@ describe("Deletion tests", () => {
     expect(reBalanceSpy).toHaveBeenCalledTimes(5);
   });
 });
+
+describe("Update tests", () => {
+  it("Should update if key found", () => {
+    const [test] = insertionTests2d;
+    const { inserts } = test;
+    const tree = initializeTree(2, inserts);
+    tree.update([7, 8], "Kebab");
+    expect(tree.search([7, 8])).toEqual([[7, 8], "Kebab"]);
+  });
+  it("Should throw a `BadOperation` error if key is of different dimension than the tree's k", () => {
+    try {
+      const tree = initializeTree(2, [{ key: [10, 10], value: "A" }]);
+      tree.update([10, 10, 10], "K");
+      fail(
+        "Should have thrown an error on updating key on a different dimension."
+      );
+    } catch (error) {
+      if (!(error instanceof TreeError)) {
+        fail("Should have thrown a `TreeError`");
+        return;
+      }
+      const { code, message } = error;
+      expect(code).toBe(TreeErrorCode.BadOperation);
+      expect(message)
+        .toBe(`Invalid key. The number of elements (dimensions) in the key must match the parameter 'k' passed to the constructor.\n
+        Expected length: 2. Actual length: 3`);
+    }
+  });
+  it("Should throw a `BadOperation` error if key is non-existent", () => {
+    try {
+      const tree = initializeTree(2, [{ key: [10, 10], value: "A" }]);
+      tree.update([10, 20], "K");
+      fail("Should have thrown an error on updating a non-existent key.");
+    } catch (error) {
+      if (!(error instanceof TreeError)) {
+        fail("Should have thrown a `TreeError`");
+        return;
+      }
+      const { code, message } = error;
+      expect(code).toBe(TreeErrorCode.BadOperation);
+      expect(message).toBe("Cannot update a non-existent point(key).");
+    }
+  });
+});
