@@ -280,3 +280,117 @@ export const imbalancedInsertions3d = [
     ],
   },
 ];
+
+export const searchClosestTests2d = {
+  inserts: insertionTests2d[0].inserts,
+  tests: [
+    {
+      testPoint: [0, 0],
+      expected: [1, 7],
+    },
+    {
+      testPoint: [11, 6],
+      expected: [10, 7],
+    },
+    {
+      testPoint: [10, 5],
+      expected: [10, 5],
+    },
+    {
+      testPoint: [12, 1],
+      expected: [12, 1],
+    },
+    {
+      testPoint: [11, 8],
+      expected: [10, 8],
+    },
+  ],
+};
+export const searchClosestTests3d = [];
+
+const getRect = (low: number[], high: number[]) => {
+  return {
+    low,
+    high,
+    getMinCoord: function (axis: number) {
+      return this.low[axis];
+    },
+    getMaxCoord: function (axis: number) {
+      return this.high[axis];
+    },
+    isWithinBounds: function (point: number[]) {
+      for (let i = 0; i < point.length; i++) {
+        if (point[i] < this.low[i] || point[i] > this.high[i]) {
+          return false;
+        }
+      }
+      return true;
+    },
+  };
+};
+
+export const searchRangeTests2d = [
+  {
+    inserts: insertionTests2d[0].inserts,
+    rect: getRect([0, 0], [7, 7]),
+    expectedOutput: [
+      [[1, 7], ""],
+      [[5, 7], ""],
+    ],
+  },
+  {
+    inserts: insertionTests2d[0].inserts,
+    rect: getRect([0, 0], [10, 10]),
+    expectedOutput: [
+      [[10, 5], ""],
+      [[7, 8], ""],
+      [[1, 7], ""],
+      [[5, 7], ""],
+      [[10, 7], ""],
+      [[10, 8], ""],
+    ],
+  },
+  {
+    inserts: insertionTests2d[0].inserts,
+    rect: getRect([10, 5], [12, 10]),
+    expectedOutput: [
+      [[10, 5], ""],
+      [[10, 7], ""],
+      [[10, 8], ""],
+    ],
+  },
+  {
+    inserts: insertionTests2d[0].inserts,
+    rect: getRect([11, 4], [12, 8]),
+    expectedOutput: [],
+  },
+];
+
+export const searchRangeTests3d = [
+  {
+    inserts: insertionTests3d[0].inserts,
+    cube: getRect([20, 10, 10], [40, 20, 30]),
+    expectedOutput: [
+      [[30, 15, 10], "A"],
+      [[20, 10, 30], "C"],
+      [[20, 10, 10], "D"],
+      [[20, 20, 20], "E"],
+      [[20, 20, 10], "G"],
+      [[20, 20, 25], "I"],
+    ],
+  },
+  {
+    inserts: insertionTests3d[0].inserts,
+    cube: getRect([30, 5, 0], [40, 15, 10]),
+    expectedOutput: [
+      [[30, 15, 10], "A"],
+      [[30, 5, 10], "K"],
+      [[30, 15, 8], "L"],
+    ],
+  },
+  {
+    inserts: insertionTests3d[0].inserts,
+    cube: getRect([30, 20, 0], [40, 40, 40]),
+    expectedOutput: [],
+  },
+];

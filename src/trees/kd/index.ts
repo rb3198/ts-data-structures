@@ -95,7 +95,7 @@ export class KDTree<V> {
     return [closestNode.key, closestNode.data];
   };
 
-  searchRange = (range: IArea) => {
+  searchRange = (range: IArea): [number[], V][] => {
     if (!this.root) {
       throw new TreeError(
         TreeErrorCode.BadOperation,
@@ -103,7 +103,7 @@ export class KDTree<V> {
       );
     }
     const nodes = this.searchRangeHelper(range, [], 0, this.root);
-    return nodes;
+    return nodes.map((node) => [node.key, node.data]);
   };
   //#endregion
 

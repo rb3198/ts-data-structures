@@ -8,14 +8,25 @@ import {
   improperKeyLengthInsertions,
   insertionTests2d,
   insertionTests3d,
+  searchClosestTests2d,
+  searchRangeTests2d,
+  searchRangeTests3d,
 } from "./cases/kd";
-const k = 2;
+
+const initializeTree = (
+  k: number,
+  inserts: {
+    key: number[];
+    value: string;
+  }[],
+  reBalanceFactor?: number
+) => {
+  const tree = new KDTree<string>(k, reBalanceFactor);
+  inserts.forEach(({ key, value }) => tree.insert(key, value));
+  return tree;
+};
 
 describe("Insertion tests", () => {
-  let tree: KDTree<string>;
-  beforeEach(() => {
-    tree = new KDTree(k);
-  });
   afterEach(() => {
     jest.restoreAllMocks();
   });
@@ -23,7 +34,7 @@ describe("Insertion tests", () => {
     "Should maintain KD Tree property on insertion --- 2D Tree",
     (test) => {
       const { inserts, inOrderTraversal } = test;
-      const tree = new KDTree<string>(k);
+      const tree = new KDTree<string>(2);
       inserts.forEach((insert) => {
         const { key, value } = insert;
         tree.insert(key, value);
@@ -50,7 +61,7 @@ describe("Insertion tests", () => {
   it.each(insertionTests2d)(
     "Should re-balance the tree after `reBalanceFactor` number of insertions if provided",
     (test) => {
-      const tree = new KDTree(k, 5);
+      const tree = new KDTree(2, 5);
       const { inserts } = test;
       const reBalanceSpy = jest.spyOn(tree, "reBalanceTree");
       inserts.forEach(({ key, value }) => tree.insert(key, value));
@@ -61,7 +72,7 @@ describe("Insertion tests", () => {
     try {
       const [test] = insertionTests2d;
       const { inserts } = test;
-      inserts.forEach(({ key, value }) => tree.insert(key, value));
+      const tree = initializeTree(2, inserts);
       tree.insert([7, 8], "Kaw");
       fail("Should have thrown a Tree Error");
     } catch (error) {
@@ -80,7 +91,7 @@ describe("Insertion tests", () => {
       const { insert, k } = test;
       try {
         const [key, value] = insert;
-        tree = new KDTree(k);
+        const tree = new KDTree(k);
         tree.insert(key, value);
         fail("Should have thrown an error informing of improper key length");
       } catch (error) {
@@ -103,10 +114,7 @@ describe("Re-balancing tests", () => {
     "Should maintain KD Tree property post re-balancing --2D Tree",
     (test) => {
       const { initialInOrderTraversal, inserts, postBalancingTraversal } = test;
-      const tree = new KDTree(2);
-      inserts.forEach(({ key, value }) => {
-        tree.insert(key, value);
-      });
+      const tree = initializeTree(2, inserts);
       expect(verifyKdTreeProperty(2, 0, tree.root)).toBe(true);
       expect(tree.inOrderTraversal(tree.root)).toEqual(initialInOrderTraversal);
       tree.reBalanceTree();
@@ -118,10 +126,7 @@ describe("Re-balancing tests", () => {
     "Should maintain KD Tree property post re-balancing --3D Tree",
     (test) => {
       const { initialInOrderTraversal, inserts, postBalancingTraversal } = test;
-      const tree = new KDTree(3);
-      inserts.forEach(({ key, value }) => {
-        tree.insert(key, value);
-      });
+      const tree = initializeTree(3, inserts);
       expect(tree.inOrderTraversal(tree.root)).toEqual(initialInOrderTraversal);
       expect(verifyKdTreeProperty(3, 0, tree.root)).toBe(true);
       tree.reBalanceTree();
@@ -129,6 +134,103 @@ describe("Re-balancing tests", () => {
       expect(tree.inOrderTraversal(tree.root)).toEqual(postBalancingTraversal);
     }
   );
+});
+
+describe("Search tests", () => {
+  it.each(insertionTests2d)(
+    "Should return a tuple of <key, value> on successful search -- 2D Tree",
+    (test) => {
+      const { inserts } = test;
+      const tree = initializeTree(2, inserts);
+      inserts.forEach(({ key, value }) => {
+        const [resultKey, resultValue] = tree.search(key);
+        expect(resultKey).toEqual(key);
+        expect(resultValue).toBe(value);
+      });
+    }
+  );
+
+  it.each(insertionTests3d)(
+    "Should return a tuple of <key, value> on successful search -- 3D Tree",
+    (test) => {
+      const { inserts } = test;
+      const tree = initializeTree(3, inserts);
+      inserts.forEach(({ key, value }) => {
+        const [resultKey, resultValue] = tree.search(key);
+        expect(resultKey).toEqual(key);
+        expect(resultValue).toBe(value);
+      });
+    }
+  );
+  it("Should throw a KeyNotFound error on unsuccessful search", () => {
+    const [test] = insertionTests2d;
+    const { inserts } = test;
+    const tree = initializeTree(2, inserts);
+    const searchKey = [10, 10];
+    try {
+      tree.search(searchKey);
+      fail(
+        `Search should have thrown an error on non-existing key ${searchKey}`
+      );
+    } catch (error) {
+      if (!(error instanceof TreeError)) {
+        fail(`Error should have been a tree error. Got: ${error}`);
+        return;
+      }
+      const { code, message } = error;
+      expect(code).toBe(TreeErrorCode.NotFound);
+      expect(message).toBe(`Could not find any data on the point 10,10`);
+    }
+  });
+});
+
+describe("Search closest tests", () => {
+  it.each(searchClosestTests2d.tests)(
+    "Should return the closest point to the searched point -- 2D Tree",
+    ({ testPoint, expected }) => {
+      const { inserts } = searchClosestTests2d;
+      const tree = initializeTree(2, inserts);
+      const [actualKey] = tree.searchClosest(testPoint);
+      expect(actualKey).toEqual(expected);
+    }
+  );
+  it("Should throw an error if called when tree is empty", () => {
+    const tree = initializeTree(2, []);
+    try {
+      const searchKey = [
+        Math.floor(Math.random() * 10),
+        Math.floor(Math.random() * 10),
+      ];
+      tree.searchClosest(searchKey);
+      fail(
+        "Expected `SearchClosest` to throw an error on searching an uninitialized tree."
+      );
+    } catch (error) {
+      if (!(error instanceof TreeError)) {
+        fail(`Should have thrown a tree error. Received: ${error}`);
+        return;
+      }
+      const { code, message } = error;
+      expect(code).toBe(TreeErrorCode.BadOperation);
+      expect(message).toBe("Need to initialize the tree before searching.");
+    }
+  });
+});
+
+describe("Search Range tests", () => {
+  it.each(searchRangeTests2d)("Should search range --2D Tree", (test) => {
+    const { inserts, expectedOutput, rect } = test;
+    const tree = initializeTree(2, inserts);
+    const output = tree.searchRange(rect);
+    expect(output).toEqual(expectedOutput);
+  });
+
+  it.each(searchRangeTests3d)("Should search range --3D Tree", (test) => {
+    const { inserts, expectedOutput, cube } = test;
+    const tree = initializeTree(3, inserts);
+    const output = tree.searchRange(cube);
+    expect(output).toEqual(expectedOutput);
+  });
 });
 
 describe("Deletion tests", () => {
@@ -180,7 +282,7 @@ describe("Deletion tests", () => {
   it.each(insertionTests2d)(
     "Should maintain KD Tree property after deletion --2D Tree",
     (test) => {
-      const tree = new KDTree<string>(k);
+      const tree = new KDTree<string>(2);
       testDeletion(2, tree, test);
     }
   );
