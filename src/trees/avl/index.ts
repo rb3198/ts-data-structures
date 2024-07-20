@@ -1,4 +1,4 @@
-import { AVLTreeError, AVLTreeErrorCode } from "./Error";
+import { TreeError, TreeErrorCode } from "../Error";
 import { Node } from "./Node";
 
 export class AVLTree<K, V> {
@@ -18,8 +18,8 @@ export class AVLTree<K, V> {
       return new Node(key, value);
     }
     if (key === root.key) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.DuplicateKey,
+      throw new TreeError(
+        TreeErrorCode.DuplicateKey,
         `Data with key ${key} already exists!`
       );
     }
@@ -65,8 +65,8 @@ export class AVLTree<K, V> {
 
   delete = (key: K) => {
     if (!this.root) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.UnexpectedOperation,
+      throw new TreeError(
+        TreeErrorCode.BadOperation,
         `Cannot delete a node in an empty tree`
       );
     }
@@ -78,8 +78,8 @@ export class AVLTree<K, V> {
     root?: Node<K, V> | null
   ): Node<K, V> | undefined | null => {
     if (!root) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.UnexpectedOperation,
+      throw new TreeError(
+        TreeErrorCode.BadOperation,
         `Cannot delete a node that was never inserted`
       );
     }
@@ -140,10 +140,10 @@ export class AVLTree<K, V> {
     return this.getMinValueNode(root.left);
   };
 
-  search = (searchKey: K) => {
+  search = (searchKey: K): [K, V] => {
     if (!this.root) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.NotFound,
+      throw new TreeError(
+        TreeErrorCode.NotFound,
         `Could not find a node with search key ${searchKey}`
       );
     }
@@ -159,8 +159,8 @@ export class AVLTree<K, V> {
         ptr = right;
       }
     }
-    throw new AVLTreeError(
-      AVLTreeErrorCode.NotFound,
+    throw new TreeError(
+      TreeErrorCode.NotFound,
       `Could not find a node with search key ${searchKey}`
     );
   };
@@ -171,8 +171,8 @@ export class AVLTree<K, V> {
    */
   searchClosest = (searchKey: K): [K, V][] => {
     if (!this.root) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.UnexpectedOperation,
+      throw new TreeError(
+        TreeErrorCode.BadOperation,
         "Cannot search in an empty tree"
       );
     }
@@ -219,8 +219,8 @@ export class AVLTree<K, V> {
   private llRotate = (root: Node<K, V>) => {
     const lChild = root.left;
     if (!lChild) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.UnexpectedOperation,
+      throw new TreeError(
+        TreeErrorCode.BadOperation,
         "Cannot LL Rotate without a left child."
       );
     }
@@ -234,8 +234,8 @@ export class AVLTree<K, V> {
   private rrRotate = (root: Node<K, V>) => {
     const rChild = root.right;
     if (!rChild) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.UnexpectedOperation,
+      throw new TreeError(
+        TreeErrorCode.BadOperation,
         "Cannot RR Rotate without a right child."
       );
     }
@@ -249,15 +249,15 @@ export class AVLTree<K, V> {
   private lrRotate = (root: Node<K, V>) => {
     const lChild = root.left;
     if (!lChild) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.UnexpectedOperation,
+      throw new TreeError(
+        TreeErrorCode.BadOperation,
         "Cannot LR Rotate without a left child."
       );
     }
     const lrChild = lChild.right;
     if (!lrChild) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.UnexpectedOperation,
+      throw new TreeError(
+        TreeErrorCode.BadOperation,
         "Cannot LR Rotate without a LR grandchild of the root."
       );
     }
@@ -275,15 +275,15 @@ export class AVLTree<K, V> {
   private rlRotate = (root: Node<K, V>) => {
     const rChild = root.right;
     if (!rChild) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.UnexpectedOperation,
+      throw new TreeError(
+        TreeErrorCode.BadOperation,
         "Cannot RL Rotate without a left child."
       );
     }
     const rlChild = rChild.left;
     if (!rlChild) {
-      throw new AVLTreeError(
-        AVLTreeErrorCode.UnexpectedOperation,
+      throw new TreeError(
+        TreeErrorCode.BadOperation,
         "Cannot RL Rotate without a RL grandchild of the root."
       );
     }

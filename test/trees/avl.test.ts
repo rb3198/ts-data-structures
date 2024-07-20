@@ -1,5 +1,5 @@
 import { AVLTree } from "../../src/trees";
-import { AVLTreeError, AVLTreeErrorCode } from "../../src/trees/avl/Error";
+import { TreeError, TreeErrorCode } from "../../src/trees/Error";
 
 const commonInput: [number, string][] = [
   [10, "Ronit"],
@@ -148,8 +148,8 @@ describe("Insertion tests", () => {
       tree.insert(10, "Test 2");
       fail();
     } catch (error) {
-      if (error instanceof AVLTreeError) {
-        expect(error.code).toBe(AVLTreeErrorCode.DuplicateKey);
+      if (error instanceof TreeError) {
+        expect(error.code).toBe(TreeErrorCode.DuplicateKey);
       } else {
         fail();
       }
@@ -171,9 +171,9 @@ describe("Search tests", () => {
       tree.search(10);
       fail();
     } catch (error) {
-      expect(error).toBeInstanceOf(AVLTreeError);
-      if (error instanceof AVLTreeError) {
-        expect(error.code).toBe(AVLTreeErrorCode.NotFound);
+      expect(error).toBeInstanceOf(TreeError);
+      if (error instanceof TreeError) {
+        expect(error.code).toBe(TreeErrorCode.NotFound);
       } else {
         fail();
       }
@@ -185,9 +185,9 @@ describe("Search tests", () => {
       tree.search(10);
       fail();
     } catch (error) {
-      expect(error).toBeInstanceOf(AVLTreeError);
-      if (error instanceof AVLTreeError) {
-        expect(error.code).toBe(AVLTreeErrorCode.NotFound);
+      expect(error).toBeInstanceOf(TreeError);
+      if (error instanceof TreeError) {
+        expect(error.code).toBe(TreeErrorCode.NotFound);
       } else {
         fail();
       }
@@ -217,8 +217,8 @@ describe("Search tests", () => {
       const output = tree.searchClosest(10);
       fail();
     } catch (error) {
-      if (error instanceof AVLTreeError) {
-        expect(error.code).toBe(AVLTreeErrorCode.UnexpectedOperation);
+      if (error instanceof TreeError) {
+        expect(error.code).toBe(TreeErrorCode.BadOperation);
       } else {
         fail();
       }
@@ -231,19 +231,19 @@ describe("Deletion tests", () => {
   beforeEach(() => {
     tree = new AVLTree();
   });
-  it("Should throw UnexpectedOperation Exception if attempted on uninitialized tree, or if the key was not found in the tree", () => {
+  it("Should throw BadOperation Exception if attempted on uninitialized tree, or if the key was not found in the tree", () => {
     try {
       tree.delete(Math.floor(Math.random() * 100));
       fail();
     } catch (error) {
-      if (error instanceof AVLTreeError) {
-        expect(error.code).toBe(AVLTreeErrorCode.UnexpectedOperation);
+      if (error instanceof TreeError) {
+        expect(error.code).toBe(TreeErrorCode.BadOperation);
         try {
           tree.insert(1, "Test");
           tree.delete(10);
         } catch (error) {
-          if (error instanceof AVLTreeError) {
-            expect(error.code).toBe(AVLTreeErrorCode.UnexpectedOperation);
+          if (error instanceof TreeError) {
+            expect(error.code).toBe(TreeErrorCode.BadOperation);
           } else {
             fail();
           }
