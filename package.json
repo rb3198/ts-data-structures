@@ -1,13 +1,14 @@
 {
   "name": "ts-data-structures-collection",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "A collection of Data Structures defined in TypeScript",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "changelog": "https://github.com/rb3198/ts-data-structures/releases",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "prepublish": "tsc"
   },
   "files": [
     "dist"
