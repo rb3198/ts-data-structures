@@ -44,7 +44,6 @@ export function PriorityQueue<T>(heapDegree: number = 2) {
   };
   const queue = {
     push: (itemWithPriority: [T, number]) => {
-      console.log("inserted", itemWithPriority[1]);
       _items.push(itemWithPriority);
       heapifyUp(_items.length - 1);
       return _items.length;
