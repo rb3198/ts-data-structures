@@ -67,6 +67,7 @@ export function PriorityQueue<T>(heapDegree: number = 2) {
       }
       return minPrEl;
     },
+    length: _items.length,
     queue: _items,
   };
   return queue;
