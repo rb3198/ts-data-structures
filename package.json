@@ -1,6 +1,6 @@
 {
   "name": "ts-data-structures-collection",
-  "version": "0.0.21",
+  "version": "0.0.23",
   "description": "A collection of Data Structures defined in TypeScript",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
