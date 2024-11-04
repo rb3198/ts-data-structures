@@ -8,6 +8,7 @@ type InsertionCase = {
 type UpdateCase = {
   queueOriginal: [number, number][];
   updateIdx: number;
+  newIdx: number;
   updatedPriority: number;
   queueUpdated: [number, number][];
 };
@@ -233,6 +234,7 @@ export const updateBinaryPriorityTests: UpdateCase[] = [
       [8, 10],
     ],
     updateIdx: 3,
+    newIdx: 0,
     updatedPriority: 0,
     queueUpdated: [
       [4, 0],
@@ -256,6 +258,7 @@ export const updateBinaryPriorityTests: UpdateCase[] = [
       [45, 4],
     ],
     updateIdx: 5,
+    newIdx: 0,
     updatedPriority: 0,
     queueUpdated: [
       [44, 0],
@@ -278,6 +281,7 @@ export const updateBinaryPriorityTests: UpdateCase[] = [
       [15, 5],
     ],
     updateIdx: 6,
+    newIdx: 6,
     updatedPriority: 4,
     queueUpdated: [
       [10, 1],
@@ -300,6 +304,7 @@ export const updateBinaryPriorityTests: UpdateCase[] = [
       [22, 7],
     ],
     updateIdx: 1,
+    newIdx: 3,
     updatedPriority: 8,
     queueUpdated: [
       [17, 1],
@@ -323,6 +328,7 @@ export const updateBinaryPriorityTests: UpdateCase[] = [
       [30, 5],
     ],
     updateIdx: 0,
+    newIdx: 7,
     updatedPriority: 8,
     queueUpdated: [
       [24, 3],
@@ -347,6 +353,7 @@ export const updateBinaryPriorityTests: UpdateCase[] = [
       [38, 8],
     ],
     updateIdx: 7,
+    newIdx: 7,
     updatedPriority: 12,
     queueUpdated: [
       [36, 1],
@@ -374,6 +381,7 @@ export const updateTriaryPriorityTests: UpdateCase[] = [
       [38, 8],
     ],
     updateIdx: 7,
+    newIdx: 0,
     updatedPriority: 0,
     queueUpdated: [
       [38, 0],
@@ -398,6 +406,7 @@ export const updateTriaryPriorityTests: UpdateCase[] = [
       [38, 8],
     ],
     updateIdx: 0,
+    newIdx: 6,
     updatedPriority: 10,
     queueUpdated: [
       [31, 2],
@@ -422,6 +431,7 @@ export const updateTriaryPriorityTests: UpdateCase[] = [
       [150, 4],
     ],
     updateIdx: 2,
+    newIdx: 7,
     updatedPriority: 10,
     queueUpdated: [
       [148, 1],
@@ -446,6 +456,7 @@ export const updateTriaryPriorityTests: UpdateCase[] = [
       [150, 4],
     ],
     updateIdx: 2,
+    newIdx: 0,
     updatedPriority: 0,
     queueUpdated: [
       [143, 0],

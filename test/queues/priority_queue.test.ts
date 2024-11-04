@@ -75,26 +75,24 @@ describe("Tests for pushing and deleting items into the queue -- Tri-ary Heap", 
   });
 });
 
-describe("Tests for updating the priority of an element -- Binary Heap", () => {
+describe("Tests for updating the priority of an element", () => {
   it.each(updateBinaryPriorityTests)(
-    "Should update the queue maintaining the heap property",
-    ({ queueOriginal, updateIdx, updatedPriority, queueUpdated }) => {
+    "Should update the queue maintaining the heap property -- Binary heap",
+    ({ queueOriginal, updateIdx, updatedPriority, queueUpdated, newIdx }) => {
       const pq = PriorityQueueFactory<number>(2);
       queueOriginal.forEach((el) => pq.push(el));
-      pq.updatePriority(updateIdx, updatedPriority);
+      expect(pq.updatePriority(updateIdx, updatedPriority)).toBe(newIdx);
       expect(verifyHeapProperty(pq)).toBeTruthy();
       expect(pq.queue).toEqual(queueUpdated);
     }
   );
-});
 
-describe("Tests for updating the priority of an element -- Tri-ary Heap", () => {
   it.each(updateTriaryPriorityTests)(
-    "Should update the queue maintaining the heap property",
-    ({ queueOriginal, updateIdx, updatedPriority, queueUpdated }) => {
+    "Should update the queue maintaining the heap property -- Tri-ary heap",
+    ({ queueOriginal, updateIdx, updatedPriority, queueUpdated, newIdx }) => {
       const pq = PriorityQueueFactory<number>(3);
       queueOriginal.forEach((el) => pq.push(el));
-      pq.updatePriority(updateIdx, updatedPriority);
+      expect(pq.updatePriority(updateIdx, updatedPriority)).toBe(newIdx);
       expect(verifyHeapProperty(pq)).toBeTruthy();
       expect(pq.queue).toEqual(queueUpdated);
     }
