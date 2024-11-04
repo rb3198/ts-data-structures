@@ -42,12 +42,72 @@ export function PriorityQueue<T>(heapDegree: number = 2) {
       index = smallest;
     }
   };
+
+  /**
+   * Given an index and the updated priority, adjusts the queue to maintain its heap property, in-place.
+   * @param idx The existing index of the targeted element.
+   * @param newPriority The new priority of the element located at `idx`.
+   * @returns The new index of the given element.
+   * If an improper index is input to this function (ex: more than the length or less than -1), returns -1.
+   */
+  const updatePriority = (idx: number, newPriority: number) => {
+    if (idx >= _items.length || idx < 0) {
+      return -1;
+    }
+    // heapify up
+    let newIdx = idx;
+    _items[newIdx][1] = newPriority;
+    while (newIdx > 0) {
+      let [, priority] = _items[newIdx];
+      let parentIdx = Math.floor((newIdx - 1) / heapDegree);
+      const [, parentPriority] = _items[parentIdx];
+      if (parentPriority > priority) {
+        [_items[parentIdx], _items[newIdx]] = [
+          _items[newIdx],
+          _items[parentIdx],
+        ];
+        newIdx = parentIdx;
+      } else {
+        break;
+      }
+    }
+    if (newIdx !== idx) {
+      return newIdx;
+    }
+    // heapify down if element wasn't heapified up (priority decreased)
+    while (true) {
+      let smallestIdx = newIdx;
+      for (let k = 1; k <= heapDegree; k++) {
+        const curIdx = childIdx(newIdx, k);
+        if (curIdx >= _items.length) {
+          break;
+        }
+        const [, smallestPriority] = _items[smallestIdx];
+        const [, childPriority] = _items[curIdx];
+        if (smallestPriority > childPriority) {
+          smallestIdx = curIdx;
+        }
+      }
+      if (smallestIdx === newIdx) {
+        break;
+      }
+
+      [_items[smallestIdx], _items[newIdx]] = [
+        _items[newIdx],
+        _items[smallestIdx],
+      ];
+      newIdx = smallestIdx;
+    }
+    return newIdx;
+  };
+
   const queue = {
     push: (itemWithPriority: [T, number]) => {
       _items.push(itemWithPriority);
       heapifyUp(_items.length - 1);
       return _items.length;
     },
+    degree: heapDegree,
     min: () => {
       return _items[0];
     },
@@ -67,8 +127,10 @@ export function PriorityQueue<T>(heapDegree: number = 2) {
       }
       return minPrEl;
     },
-    length: _items.length,
+    updatePriority,
+    length: () => _items.length,
     queue: _items,
   };
+
   return queue;
 }
