@@ -101,6 +101,52 @@ export function PriorityQueue<T>(heapDegree: number = 2) {
     return newIdx;
   };
 
+  const findByPriorityHelper = (rootIdx: number, priority: number) => {
+    if (!_items[rootIdx]) {
+      return -1;
+    }
+    const [, rootPriority] = _items[rootIdx];
+    if (rootPriority === priority) {
+      return rootIdx;
+    }
+    let idx = -1;
+    for (let k = 1; k <= heapDegree; k++) {
+      idx = findByPriorityHelper(childIdx(rootIdx, k), priority);
+      if (idx != -1) {
+        break;
+      }
+    }
+    return idx;
+  };
+
+  /**
+   * Finds an element in the queue with the given priority.
+   * Priority queue optimization is only available for the preference of `any`,
+   * i.e. when the position of the returned value does not matter in case of multiple matches.
+   * @param priority The target priority.
+   * @param preference Preference of element position in case of multiple matches.
+   * @returns The first element in the queue with the given priority.
+   */
+  const findByPriority = (
+    priority: number,
+    preference: "any" | "first" | "last" = "first"
+  ) => {
+    if (!queue.length()) {
+      return -1;
+    }
+    if (preference === "first") {
+      return _items.findIndex((element) => element[1] === priority);
+    }
+    if (preference === "last") {
+      for (let i = _items.length - 1; i >= 0; i--) {
+        if (_items[i][1] === priority) {
+          return i;
+        }
+      }
+    }
+    return findByPriorityHelper(0, priority);
+  };
+
   const queue = {
     push: (itemWithPriority: [T, number]) => {
       _items.push(itemWithPriority);
@@ -129,6 +175,7 @@ export function PriorityQueue<T>(heapDegree: number = 2) {
     },
     findIndex: _items.findIndex,
     find: _items.find,
+    findByPriority,
     updatePriority,
     length: () => _items.length,
     queue: _items,

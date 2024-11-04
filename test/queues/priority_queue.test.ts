@@ -100,3 +100,77 @@ describe("Tests for updating the priority of an element -- Tri-ary Heap", () => 
     }
   );
 });
+
+describe("Tests for finding items by priority", () => {
+  it.each([2, 3])(
+    "Should return the correct index for each of the items searched by priority -- any order",
+    (degree) => {
+      const queue: [number, number][] = [
+        [148, 1],
+        [145, 2],
+        [143, 3],
+        [144, 4],
+        [146, 6],
+        [147, 5],
+        [149, 4],
+        [150, 5],
+      ];
+      const pq = PriorityQueueFactory<number>(degree);
+      queue.forEach((el) => pq.push(el));
+      expect(pq.findByPriority(1, "any")).toBe(0);
+      expect(pq.findByPriority(2, "any")).toBe(1);
+      expect(pq.findByPriority(3, "any")).toBe(2);
+      expect([3, 6]).toContain(pq.findByPriority(4, "any"));
+      expect([5, 7]).toContain(pq.findByPriority(5, "any"));
+      expect(pq.findByPriority(6, "any")).toBe(4);
+    }
+  );
+
+  it.each([2, 3])(
+    "Should return the correct index for each of the items searched by priority -- first element",
+    (degree) => {
+      const queue: [number, number][] = [
+        [148, 1],
+        [145, 2],
+        [143, 3],
+        [144, 4],
+        [146, 6],
+        [147, 5],
+        [149, 4],
+        [150, 5],
+      ];
+      const pq = PriorityQueueFactory<number>(degree);
+      queue.forEach((el) => pq.push(el));
+      expect(pq.findByPriority(1, "first")).toBe(0);
+      expect(pq.findByPriority(2, "first")).toBe(1);
+      expect(pq.findByPriority(3, "first")).toBe(2);
+      expect(pq.findByPriority(4, "first")).toBe(3);
+      expect(pq.findByPriority(5, "first")).toBe(5);
+      expect(pq.findByPriority(6, "first")).toBe(4);
+    }
+  );
+
+  it.each([2, 3])(
+    "Should return the correct index for each of the items searched by priority -- last element",
+    (degree) => {
+      const queue: [number, number][] = [
+        [148, 1],
+        [145, 2],
+        [143, 3],
+        [144, 4],
+        [146, 6],
+        [147, 5],
+        [149, 4],
+        [150, 5],
+      ];
+      const pq = PriorityQueueFactory<number>(degree);
+      queue.forEach((el) => pq.push(el));
+      expect(pq.findByPriority(1, "last")).toBe(0);
+      expect(pq.findByPriority(2, "last")).toBe(1);
+      expect(pq.findByPriority(3, "last")).toBe(2);
+      expect(pq.findByPriority(4, "last")).toBe(6);
+      expect(pq.findByPriority(5, "last")).toBe(7);
+      expect(pq.findByPriority(6, "last")).toBe(4);
+    }
+  );
+});
