@@ -127,9 +127,16 @@ export function PriorityQueue<T>(heapDegree: number = 2) {
       }
       return minPrEl;
     },
+    findIndex: _items.findIndex,
+    find: _items.find,
     updatePriority,
     length: () => _items.length,
     queue: _items,
+    [Symbol.iterator]: function* () {
+      for (let el of _items) {
+        yield el;
+      }
+    },
   };
 
   return queue;
